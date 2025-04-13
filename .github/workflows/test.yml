@@ -32,6 +32,7 @@ on:
          - secrets-manager
          - parameter-store
          - kms
+         - acm
 
       secret_name:
         description: "Secret/Key name"
