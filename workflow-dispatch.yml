@@ -1,0 +1,84 @@
+name: Test Secret Management Action
+on:
+  workflow_dispatch:
+    inputs:
+      service:
+        description: 'Service to test (azure-keyvault, aws-parameter-store, aws-secrets-manager, aws-kms, aws-acm)'
+        required: true
+        default: 'azure-keyvault'
+      action:
+        description: 'Action to perform (list, create, update, delete, recover)'
+        required: true
+        default: 'list'
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      # Azure setup
+      - name: Azure Login
+        if: ${{ inputs.service == 'azure-keyvault' }}
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+      # AWS setup
+      - name: Configure AWS credentials
+        if: ${{ startsWith(inputs.service, 'aws-') }}
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+      # Test Azure Key Vault
+      - name: Test Azure Key Vault Action
+        if: ${{ inputs.service == 'azure-keyvault' }}
+        uses: ./
+        with:
+          vault: ${{ secrets.AZURE_KEYVAULT_NAME }}
+          action: ${{ inputs.action }}
+          secret_name: ${{ inputs.action != 'list' && 'test-secret' || '' }}
+          secret_value: ${{ (inputs.action == 'create' || inputs.action == 'update') && 'test-value' || '' }}
+      # Test AWS Parameter Store
+      - name: Test AWS Parameter Store Action
+        if: ${{ inputs.service == 'aws-parameter-store' }}
+        uses: ./
+        with:
+          vault: "dummy-value"
+          action: ${{ inputs.action }}
+          secret_name: ${{ inputs.action != 'list' && '/test/parameter' || '' }}
+          secret_value: ${{ (inputs.action == 'create' || inputs.action == 'update') && 'test-value' || '' }}
+          aws_service: "parameter-store"
+          aws_parameter_type: "SecureString"
+          aws_tags: '{"Environment":"Test"}'
+      # Test AWS Secrets Manager
+      - name: Test AWS Secrets Manager Action
+        if: ${{ inputs.service == 'aws-secrets-manager' }}
+        uses: ./
+        with:
+          vault: "dummy-value"
+          action: ${{ inputs.action }}
+          secret_name: ${{ inputs.action != 'list' && 'test/secret' || '' }}
+          secret_value: ${{ (inputs.action == 'create' || inputs.action == 'update') && 'test-value' || '' }}
+          aws_service: "secrets-manager"
+          aws_tags: '{"Environment":"Test"}'
+      # Test AWS KMS
+      - name: Test AWS KMS Action
+        if: ${{ inputs.service == 'aws-kms' }}
+        uses: ./
+        with:
+          vault: "dummy-value"
+          action: ${{ inputs.action }}
+          secret_name: ${{ inputs.action != 'list' && 'test-key' || '' }}
+          aws_service: "kms"
+          aws_tags: '{"Purpose":"Testing"}'
+      # Test AWS ACM
+      - name: Test AWS ACM Action
+        if: ${{ inputs.service == 'aws-acm' }}
+        uses: ./
+        with:
+          vault: "dummy-value"
+          action: ${{ inputs.action }}
+          secret_name: ${{ inputs.action != 'list' && inputs.action != 'create' && 'arn:aws:acm:us-east-1:123456789012:certificate/abcdef12-3456-7890-abcd-ef1234567890' || '' }}
+          secret_value: ${{ inputs.action == 'create' && 'test-certificate-content' || '' }}
+          aws_service: "acm"
