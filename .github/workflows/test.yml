@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       service:
-        description: 'Service to test (azure-keyvault, aws-parameter-store, aws-secrets-manager, aws-kms, aws-acm)'
+        description: 'az kv, aws-ps, aws-sm, aws-kms, aws-acm)'
         required: true
         default: 'azure-keyvault'
         type: choice
