@@ -6,10 +6,48 @@ on:
         description: 'Service to test (azure-keyvault, aws-parameter-store, aws-secrets-manager, aws-kms, aws-acm)'
         required: true
         default: 'azure-keyvault'
+        type: choice
+        options:
+          - aws
+          - azure
+
       action:
         description: 'Action to perform (list, create, update, delete, recover)'
         required: true
         default: 'list'
+        type: choice
+        options: 
+          - list
+          - create
+          - update
+          - delete
+          - recover
+
+      aws_service:
+       description: "AWS Secret Service"
+       required: true
+       default: "secrets-manager"
+       type: choice
+       options:
+         - secrets-manager
+         - parameter-store
+         - kms
+
+      secret_name:
+        description: "Secret/Key name"
+        type: string
+
+      secret_value:
+        description: "Secret value (one line)"
+        type: string
+        required: false
+
+      project:
+        description: "Project"
+        type: string
+        default: "devops"
+
+
 jobs:
   test:
     runs-on: ubuntu-latest
