@@ -1,0 +1,120 @@
+name: Manage Secrets in Key Vault
+description: GitHub Action to manage (create/update/delete/list) secrets in the Key Vault
+
+inputs:
+  vault:
+    description: "Secrets Vault name. For example, sgwsdevopsinitue1kv-main"
+    required: true
+  secret_name:
+    description: "Secret name to be created/updated"
+  secret_value:
+    description: "Secret value to be created/updated"
+  action:
+    description: "Action to be taken against secret/key vault. Acceptable values: list, create, update, delete, recover"
+    required: true
+  kv_project_tag:
+    description: "KV Secret tag"
+    default: ""
+# AWS specific inputs
+  aws_service:
+    description: "AWS service to use. Acceptable values: parameter-store, secrets-manager, kms, acm"
+    required: false
+  aws_region:
+    description: "AWS region to use"
+    required: false
+    default: "us-east-1"
+  aws_parameter_type:
+    description: "For Parameter Store: Type of parameter (String, StringList, SecureString)"
+    required: false
+    default: "SecureString"
+  aws_kms_key_id:
+    description: "KMS Key ID for encrypting secrets (optional for Parameter Store and Secrets Manager)"
+    required: false
+  aws_tags:
+    description: "Tags to apply to AWS resources in JSON format: '{\"key1\":\"value1\",\"key2\":\"value2\"}'"
+    required: false
+    default: "{}"
+
+runs:
+  using: "composite"
+  steps:
+    - if: ${{ inputs.action == 'list' }}
+      name: list-secrets-shell
+      id: list-secrets-shell
+      env:
+        INPUT_VAULT: ${{ inputs.vault }}
+        INPUT_SECRET_NAME: ${{ inputs.secret_name }}
+        INPUT_SECRET_VALUE: ${{ inputs.secret_value }}
+        INPUT_ACTION: ${{ inputs.action }}
+        INPUT_KV_PROJECT_TAG: ${{ inputs.kv_project_tag }}
+        INPUT_AWS_SERVICE: ${{ inputs.aws_service }}
+        INPUT_AWS_REGION: ${{ inputs.aws_region }}
+        INPUT_AWS_PARAMETER_TYPE: ${{ inputs.aws_parameter_type }}
+        INPUT_AWS_KMS_KEY_ID: ${{ inputs.aws_kms_key_id }}
+        INPUT_AWS_TAGS: ${{ inputs.aws_tags }}
+      run: ${GITHUB_ACTION_PATH}/entrypoint.sh
+      shell: bash
+    - if: ${{ inputs.action == 'create' }}
+      name: create-secrets-shell
+      id: create-secrets-shell
+      env:
+        INPUT_VAULT: ${{ inputs.vault }}
+        INPUT_SECRET_NAME: ${{ inputs.secret_name }}
+        INPUT_SECRET_VALUE: ${{ inputs.secret_value }}
+        INPUT_ACTION: ${{ inputs.action }}
+        INPUT_KV_PROJECT_TAG: ${{ inputs.kv_project_tag }}
+        INPUT_AWS_SERVICE: ${{ inputs.aws_service }}
+        INPUT_AWS_REGION: ${{ inputs.aws_region }}
+        INPUT_AWS_PARAMETER_TYPE: ${{ inputs.aws_parameter_type }}
+        INPUT_AWS_KMS_KEY_ID: ${{ inputs.aws_kms_key_id }}
+        INPUT_AWS_TAGS: ${{ inputs.aws_tags }}
+      run: ${GITHUB_ACTION_PATH}/entrypoint.sh
+      shell: bash
+    - if: ${{ inputs.action == 'update' }}
+      name: update-secrets-shell
+      id: update-secrets-shell
+      env:
+        INPUT_VAULT: ${{ inputs.vault }}
+        INPUT_SECRET_NAME: ${{ inputs.secret_name }}
+        INPUT_SECRET_VALUE: ${{ inputs.secret_value }}
+        INPUT_ACTION: ${{ inputs.action }}
+        INPUT_KV_PROJECT_TAG: ${{ inputs.kv_project_tag }}
+        INPUT_AWS_SERVICE: ${{ inputs.aws_service }}
+        INPUT_AWS_REGION: ${{ inputs.aws_region }}
+        INPUT_AWS_PARAMETER_TYPE: ${{ inputs.aws_parameter_type }}
+        INPUT_AWS_KMS_KEY_ID: ${{ inputs.aws_kms_key_id }}
+        INPUT_AWS_TAGS: ${{ inputs.aws_tags }}
+      run: ${GITHUB_ACTION_PATH}/entrypoint.sh
+      shell: bash
+    - if: ${{ inputs.action == 'delete' }}
+      name: delete-secrets-shell
+      id: delete-secrets-shell
+      env:
+        INPUT_VAULT: ${{ inputs.vault }}
+        INPUT_SECRET_NAME: ${{ inputs.secret_name }}
+        INPUT_SECRET_VALUE: ${{ inputs.secret_value }}
+        INPUT_ACTION: ${{ inputs.action }}
+        INPUT_KV_PROJECT_TAG: ${{ inputs.kv_project_tag }}
+        INPUT_AWS_SERVICE: ${{ inputs.aws_service }}
+        INPUT_AWS_REGION: ${{ inputs.aws_region }}
+        INPUT_AWS_PARAMETER_TYPE: ${{ inputs.aws_parameter_type }}
+        INPUT_AWS_KMS_KEY_ID: ${{ inputs.aws_kms_key_id }}
+        INPUT_AWS_TAGS: ${{ inputs.aws_tags }}
+      run: ${GITHUB_ACTION_PATH}/entrypoint.sh
+      shell: bash
+    - if: ${{ inputs.action == 'recover' }}
+      name: recover-secrets-shell
+      id: recover-secrets-shell
+      env:
+        INPUT_VAULT: ${{ inputs.vault }}
+        INPUT_SECRET_NAME: ${{ inputs.secret_name }}
+        INPUT_SECRET_VALUE: ${{ inputs.secret_value }}
+        INPUT_ACTION: ${{ inputs.action }}
+        INPUT_KV_PROJECT_TAG: ${{ inputs.kv_project_tag }}
+        INPUT_AWS_SERVICE: ${{ inputs.aws_service }}
+        INPUT_AWS_REGION: ${{ inputs.aws_region }}
+        INPUT_AWS_PARAMETER_TYPE: ${{ inputs.aws_parameter_type }}
+        INPUT_AWS_KMS_KEY_ID: ${{ inputs.aws_kms_key_id }}
+        INPUT_AWS_TAGS: ${{ inputs.aws_tags }}
+      run: ${GITHUB_ACTION_PATH}/entrypoint.sh
+      shell: bash
